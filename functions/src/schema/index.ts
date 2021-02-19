@@ -7,7 +7,6 @@ import {
   GraphQLFloat,
   GraphQLSchema,
   GraphQLList
-  // GraphQLInputObjectType
 } from 'graphql';
 
 const CentroidType = new GraphQLObjectType({
@@ -115,12 +114,19 @@ const BrandingSubType = new GraphQLObjectType({
   })
 });
 
-const BrandingType = new GraphQLObjectType({
-  name: 'Branding',
+const BrandingDetailsType = new GraphQLObjectType({
+  name: 'BrandingDetails',
   fields: () => ({
     listing_agent: { type: BrandingSubType },
     listing_office: { type: BrandingSubType },
     team_name: { type: GraphQLString }
+  })
+});
+
+const BrandingForSalesType = new GraphQLObjectType({
+  name: 'BrandingForSale',
+  fields: () => ({
+    listing_office: { type: BrandingSubType }
   })
 });
 
@@ -300,7 +306,8 @@ const PublicRecordsType = new GraphQLObjectType({
 const OfficeType = new GraphQLObjectType({
   name: 'Office',
   fields: () => ({
-    id: { type: GraphQLString },
+    id: { type: GraphQLID },
+    name: { type: GraphQLString },
     phones: { type: new GraphQLList(GraphQLString) }
   })
 });
@@ -308,7 +315,11 @@ const OfficeType = new GraphQLObjectType({
 const AgentsType = new GraphQLObjectType({
   name: 'Agents',
   fields: () => ({
-    primary: { type: GraphQLBoolean }
+    primary: { type: GraphQLBoolean },
+    advertiser_id: { type: GraphQLID },
+    id: { type: GraphQLID },
+    photo: { type: HrefType },
+    name: { type: GraphQLString }
   })
 });
 
@@ -352,7 +363,7 @@ const DetailType = new GraphQLObjectType({
     pool: { type: GraphQLBoolean },
     style: { type: GraphQLString },
     feature_tags: { type: new GraphQLList(GraphQLString) },
-    branding: { type: BrandingType },
+    branding: { type: BrandingDetailsType },
     address: { type: AddressType },
     features: { type: new GraphQLList(FeaturesType) },
     mls: { type: MLSType },
@@ -406,23 +417,40 @@ const SoldType = new GraphQLObjectType({
     rank: { type: GraphQLInt },
     list_tracking: { type: GraphQLString },
     is_new_construction: { type: GraphQLBoolean },
-    photo_count: { type: GraphQLInt },
+    photo_count: { type: GraphQLString },
     photos: { type: new GraphQLList(PhotosType) }
   })
 });
 
-// const PropertyTypeType = new GraphQLInputObjectType({
-//   name: 'PropertyType',
-//   fields: () => ({
-//     single_family: { type: GraphQLString },
-//     multi_family: { type: GraphQLString },
-//     condo: { type: GraphQLString },
-//     mobile: { type: GraphQLString },
-//     land: { type: GraphQLString },
-//     farm: { type: GraphQLString },
-//     other: { type: GraphQLString }
-//   })
-// });
+const ForSaleType = new GraphQLObjectType({
+  name: 'ForSale',
+  fields: () => ({
+    property_id: { type: GraphQLString },
+    listing_id: { type: GraphQLString },
+    rdc_web_url: { type: GraphQLString },
+    prop_type: { type: GraphQLString },
+    virtual_tour: { type: HrefType },
+    address: { type: AddressType },
+    branding: { type: BrandingForSalesType },
+    prop_status: { type: GraphQLString },
+    price: { type: GraphQLInt },
+    baths_full: { type: GraphQLInt },
+    baths_half: { type: GraphQLInt },
+    baths: { type: GraphQLInt },
+    beds: { type: GraphQLInt },
+    building_size: { type: SizeType },
+    agents: { type: new GraphQLList(AgentsType) },
+    office: { type: OfficeType },
+    last_update: { type: GraphQLString },
+    client_display_flags: { type: ClientDisplayFlagsType },
+    photo_count: { type: GraphQLInt },
+    thumbnail: { type: GraphQLString },
+    page_no: { type: GraphQLInt },
+    rank: { type: GraphQLInt },
+    lot_size: { type: SizeType },
+    mls: { type: MLSType }
+  })
+});
 
 const RootQueryType = new GraphQLObjectType({
   name: 'RootQuery',
@@ -443,7 +471,7 @@ const RootQueryType = new GraphQLObjectType({
         return await getDetail(propertyId);
       }
     },
-    solds: {
+    propertiesSold: {
       type: new GraphQLList(SoldType),
       args: {
         zip: { type: GraphQLString },
@@ -452,6 +480,17 @@ const RootQueryType = new GraphQLObjectType({
       async resolve(_, args) {
         const { getSolds } = await import('../resolvers');
         return await getSolds(args);
+      }
+    },
+    propertiesForSale: {
+      type: new GraphQLList(ForSaleType),
+      args: {
+        zip: { type: GraphQLString },
+        propertyType: { type: GraphQLString }
+      },
+      async resolve(_, args) {
+        const { getForSales } = await import('../resolvers');
+        return await getForSales(args);
       }
     }
   }
