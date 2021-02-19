@@ -40,3 +40,53 @@ export const getDetail = async (propertyId: string) => {
     return 'There was a problem';
   }
 };
+
+export const getSolds = async (args: any) => {
+  const options = {
+    method: 'GET' as 'GET',
+    url: 'https://realtor.p.rapidapi.com/properties/v2/list-sold',
+    params: {
+      prop_type: args.propertyType,
+      postal_code: args.zip,
+      offset: 0,
+      limit: 200
+    },
+    headers: {
+      'x-rapidapi-key': `${functions.config().realtor_api.key}`,
+      'x-rapidapi-host': 'realtor.p.rapidapi.com'
+    }
+  };
+
+  try {
+    const { data } = await axios.request(options);
+    return data.properties;
+  } catch (error) {
+    functions.logger.error(error.message);
+    return 'There was a problem';
+  }
+};
+
+export const getForSales = async (args: any) => {
+  const options = {
+    method: 'GET' as 'GET',
+    url: 'https://realtor.p.rapidapi.com/properties/v2/list-for-sale',
+    params: {
+      prop_type: args.propertyType,
+      postal_code: args.zip,
+      offset: 0,
+      limit: 200
+    },
+    headers: {
+      'x-rapidapi-key': `${functions.config().realtor_api.key}`,
+      'x-rapidapi-host': 'realtor.p.rapidapi.com'
+    }
+  };
+
+  try {
+    const { data } = await axios.request(options);
+    return data.properties;
+  } catch (error) {
+    functions.logger.error(error.message);
+    return 'There was a problem';
+  }
+};

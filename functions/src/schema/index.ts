@@ -7,6 +7,7 @@ import {
   GraphQLFloat,
   GraphQLSchema,
   GraphQLList
+  // GraphQLInputObjectType
 } from 'graphql';
 
 const CentroidType = new GraphQLObjectType({
@@ -128,7 +129,6 @@ const AddressType = new GraphQLObjectType({
   fields: () => ({
     city: { type: GraphQLString },
     line: { type: GraphQLString },
-    unit_value: { type: GraphQLString },
     street_direction: { type: GraphQLString },
     street_post_direction: { type: GraphQLString },
     postal_code: { type: GraphQLString },
@@ -139,7 +139,8 @@ const AddressType = new GraphQLObjectType({
     fips_code: { type: GraphQLString },
     time_zone: { type: GraphQLString },
     lat: { type: GraphQLFloat },
-    lon: { type: GraphQLFloat }
+    lon: { type: GraphQLFloat },
+    neighborhood_name: { type: GraphQLString }
   })
 });
 
@@ -210,7 +211,8 @@ const ClientDisplayFlagsType = new GraphQLObjectType({
     is_contingent: { type: GraphQLBoolean },
     show_contact_a_lender_in_lead_form: { type: GraphQLBoolean },
     show_veterans_united_in_lead_form: { type: GraphQLBoolean },
-    is_showcase_choice_enabled: { type: GraphQLBoolean }
+    is_showcase_choice_enabled: { type: GraphQLBoolean },
+    is_recently_sold: { type: GraphQLBoolean }
   })
 });
 
@@ -377,6 +379,51 @@ const DetailType = new GraphQLObjectType({
   })
 });
 
+const SoldType = new GraphQLObjectType({
+  name: 'Sold',
+  fields: () => ({
+    property_id: { type: GraphQLString },
+    prop_type: { type: GraphQLString },
+    list_date: { type: GraphQLString },
+    last_update: { type: GraphQLString },
+    year_built: { type: GraphQLInt },
+    beds: { type: GraphQLInt },
+    baths_full: { type: GraphQLInt },
+    baths_half: { type: GraphQLInt },
+    prop_status: { type: GraphQLString },
+    address: { type: AddressType },
+    client_display_flags: { type: ClientDisplayFlagsType },
+    sold_history: { type: new GraphQLList(SoldHistoryType) },
+    agents: { type: new GraphQLList(AgentsType) },
+    lot_size: { type: SizeType },
+    building_size: { type: SizeType },
+    price: { type: GraphQLInt },
+    rdc_web_url: { type: GraphQLString },
+    rdc_app_url: { type: GraphQLString },
+    baths: { type: GraphQLInt },
+    data_source_name: { type: GraphQLString },
+    page_no: { type: GraphQLInt },
+    rank: { type: GraphQLInt },
+    list_tracking: { type: GraphQLString },
+    is_new_construction: { type: GraphQLBoolean },
+    photo_count: { type: GraphQLInt },
+    photos: { type: new GraphQLList(PhotosType) }
+  })
+});
+
+// const PropertyTypeType = new GraphQLInputObjectType({
+//   name: 'PropertyType',
+//   fields: () => ({
+//     single_family: { type: GraphQLString },
+//     multi_family: { type: GraphQLString },
+//     condo: { type: GraphQLString },
+//     mobile: { type: GraphQLString },
+//     land: { type: GraphQLString },
+//     farm: { type: GraphQLString },
+//     other: { type: GraphQLString }
+//   })
+// });
+
 const RootQueryType = new GraphQLObjectType({
   name: 'RootQuery',
   fields: {
@@ -394,6 +441,17 @@ const RootQueryType = new GraphQLObjectType({
       async resolve(_, { propertyId }) {
         const { getDetail } = await import('../resolvers');
         return await getDetail(propertyId);
+      }
+    },
+    solds: {
+      type: new GraphQLList(SoldType),
+      args: {
+        zip: { type: GraphQLString },
+        propertyType: { type: GraphQLString }
+      },
+      async resolve(_, args) {
+        const { getSolds } = await import('../resolvers');
+        return await getSolds(args);
       }
     }
   }
