@@ -90,3 +90,26 @@ export const getForSales = async (args: any) => {
     return 'There was a problem';
   }
 };
+
+export const getAgents = async (args: any) => {
+  const options = {
+    method: 'GET' as 'GET',
+    url: 'https://realtor.p.rapidapi.com/agents/list',
+    params: {
+      postal_code: args.zip,
+      sort: 'recent_activity_high'
+    },
+    headers: {
+      'x-rapidapi-key': `${functions.config().realtor_api.key}`,
+      'x-rapidapi-host': 'realtor.p.rapidapi.com'
+    }
+  };
+
+  try {
+    const { data } = await axios.request(options);
+    return data.agents;
+  } catch (error) {
+    functions.logger.error(error.message);
+    return 'There was a problem';
+  }
+};

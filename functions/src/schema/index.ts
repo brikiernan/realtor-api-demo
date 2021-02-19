@@ -452,6 +452,164 @@ const ForSaleType = new GraphQLObjectType({
   })
 });
 
+const AgentAddressType = new GraphQLObjectType({
+  name: 'AgentAddress',
+  fields: () => ({
+    line: { type: GraphQLString },
+    line2: { type: GraphQLString },
+    city: { type: GraphQLString },
+    postal_code: { type: GraphQLString },
+    state_code: { type: GraphQLString },
+    state: { type: GraphQLString },
+    country: { type: GraphQLString }
+  })
+});
+
+const AgentBrokerType = new GraphQLObjectType({
+  name: 'AgentBroker',
+  fields: () => ({
+    fulfillment_id: { type: GraphQLInt },
+    designations: { type: new GraphQLList(GraphQLString) },
+    name: { type: GraphQLString },
+    accent_color: { type: GraphQLString },
+    photo: { type: HrefType },
+    video: { type: GraphQLString }
+  })
+});
+
+const AgentMemberType = new GraphQLObjectType({
+  name: 'AgentMember',
+  fields: () => ({
+    id: { type: GraphQLID }
+  })
+});
+
+const AgentMLSType = new GraphQLObjectType({
+  name: 'AgentMLS',
+  fields: () => ({
+    member: { type: AgentMemberType },
+    abbreviation: { type: GraphQLString },
+    type: { type: GraphQLString },
+    primary: { type: GraphQLBoolean }
+  })
+});
+
+const AgentOfficePhonesType = new GraphQLObjectType({
+  name: 'AgentOfficePhones',
+  fields: () => ({
+    ext: { type: GraphQLString },
+    number: { type: GraphQLString },
+    type: { type: GraphQLString }
+  })
+});
+
+const AgentOfficePhoneListType = new GraphQLObjectType({
+  name: 'AgentOfficePhoneList',
+  fields: () => ({
+    phone_1: { type: AgentOfficePhonesType }
+  })
+});
+
+const AgentOfficeType = new GraphQLObjectType({
+  name: 'AgentOffice',
+  fields: () => ({
+    name: { type: GraphQLString },
+    mls: { type: new GraphQLList(AgentMLSType) },
+    phones: { type: new GraphQLList(AgentOfficePhonesType) },
+    phone_list: { type: AgentOfficePhoneListType },
+    photo: { type: HrefType },
+    slogan: { type: GraphQLString },
+    website: { type: GraphQLString },
+    video: { type: GraphQLString },
+    fulfillment_id: { type: GraphQLInt },
+    address: { type: AgentAddressType },
+    email: { type: GraphQLString },
+    party_id: { type: GraphQLID },
+    nrds_id: { type: GraphQLID }
+  })
+});
+
+const AgentPhonesType = new GraphQLObjectType({
+  name: 'AgentPhones',
+  fields: () => ({
+    ext: { type: GraphQLString },
+    number: { type: GraphQLString },
+    type: { type: GraphQLString },
+    key: { type: GraphQLString }
+  })
+});
+
+const ForSalePriceType = new GraphQLObjectType({
+  name: 'ForSalePrice',
+  fields: () => ({
+    count: { type: GraphQLInt },
+    min: { type: GraphQLInt },
+    max: { type: GraphQLInt },
+    last_listing_date: { type: GraphQLString }
+  })
+});
+
+const RecentlySoldType = new GraphQLObjectType({
+  name: 'RecentlySold',
+  fields: () => ({
+    count: { type: GraphQLInt },
+    last_sold_date: { type: GraphQLString },
+    max: { type: GraphQLInt },
+    min: { type: GraphQLInt }
+  })
+});
+
+const AgentTeamDetailsType = new GraphQLObjectType({
+  name: 'AgentTeamDetails',
+  fields: () => ({
+    is_team_member: { type: GraphQLBoolean },
+    team_advertiser_id: { type: GraphQLInt }
+  })
+});
+
+const AgentDetailType = new GraphQLObjectType({
+  name: 'AgentDetail',
+  fields: () => ({
+    address: { type: AgentAddressType },
+    advertiser_id: { type: GraphQLInt },
+    agent_rating: { type: GraphQLInt },
+    broker: { type: AgentBrokerType },
+    description: { type: GraphQLString },
+    designations: { type: new GraphQLList(GraphQLString) },
+    first_month: { type: GraphQLInt },
+    first_name: { type: GraphQLString },
+    first_year: { type: GraphQLInt },
+    has_photo: { type: GraphQLBoolean },
+    href: { type: GraphQLString },
+    id: { type: GraphQLID },
+    is_realtor: { type: GraphQLBoolean },
+    languages: { type: new GraphQLList(GraphQLString) },
+    last_name: { type: GraphQLString },
+    last_updated: { type: GraphQLString },
+    mls: { type: new GraphQLList(AgentMLSType) },
+    nar_only: { type: GraphQLInt },
+    nick_name: { type: GraphQLString },
+    nrds_id: { type: GraphQLID },
+    office: { type: AgentOfficeType },
+    party_id: { type: GraphQLInt },
+    person_name: { type: GraphQLString },
+    phones: { type: new GraphQLList(AgentPhonesType) },
+    photo: { type: HrefType },
+    title: { type: GraphQLString },
+    types: { type: GraphQLString },
+    recommendations_count: { type: GraphQLInt },
+    review_count: { type: GraphQLInt },
+    role: { type: GraphQLString },
+    email: { type: GraphQLString },
+    full_name: { type: GraphQLString },
+    name: { type: GraphQLString },
+    agent_type: { type: new GraphQLList(GraphQLString) },
+    for_sale_price: { type: ForSalePriceType },
+    recently_sold: { type: RecentlySoldType },
+    agent_team_details: { type: AgentTeamDetailsType }
+  })
+});
+
 const RootQueryType = new GraphQLObjectType({
   name: 'RootQuery',
   fields: {
@@ -491,6 +649,14 @@ const RootQueryType = new GraphQLObjectType({
       async resolve(_, args) {
         const { getForSales } = await import('../resolvers');
         return await getForSales(args);
+      }
+    },
+    agents: {
+      type: new GraphQLList(AgentDetailType),
+      args: { zip: { type: GraphQLString } },
+      async resolve(_, args) {
+        const { getAgents } = await import('../resolvers');
+        return await getAgents(args);
       }
     }
   }
