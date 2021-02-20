@@ -623,17 +623,33 @@ const RootQueryType = new GraphQLObjectType({
     },
     propertyDetail: {
       type: DetailType,
-      args: { propertyId: { type: GraphQLString } },
-      async resolve(_, { propertyId }) {
+      args: { property_id: { type: GraphQLString } },
+      async resolve(_, { property_id }) {
         const { getDetail } = await import('../resolvers');
-        return await getDetail(propertyId);
+        return await getDetail(property_id);
       }
     },
     propertiesSold: {
       type: new GraphQLList(SoldType),
       args: {
-        zip: { type: GraphQLString },
-        propertyType: { type: GraphQLString }
+        offset: { type: GraphQLInt },
+        limit: { type: GraphQLInt },
+        city: { type: GraphQLString },
+        state_code: { type: GraphQLString },
+        postal_code: { type: GraphQLString },
+        prop_type: { type: GraphQLString },
+        sort: { type: GraphQLString },
+        radius: { type: GraphQLInt },
+        price_min: { type: GraphQLInt },
+        price_max: { type: GraphQLInt },
+        baths_min: { type: GraphQLInt },
+        beds_min: { type: GraphQLInt },
+        sqft_min: { type: GraphQLInt },
+        sqft_max: { type: GraphQLInt },
+        age_min: { type: GraphQLInt },
+        age_max: { type: GraphQLInt },
+        lot_sqft_min: { type: GraphQLInt },
+        lot_sqft_max: { type: GraphQLInt }
       },
       async resolve(_, args) {
         const { getSolds } = await import('../resolvers');
@@ -643,8 +659,33 @@ const RootQueryType = new GraphQLObjectType({
     propertiesForSale: {
       type: new GraphQLList(ForSaleType),
       args: {
-        zip: { type: GraphQLString },
-        propertyType: { type: GraphQLString }
+        offset: { type: GraphQLInt },
+        limit: { type: GraphQLInt },
+        city: { type: GraphQLString },
+        state_code: { type: GraphQLString },
+        postal_code: { type: GraphQLString },
+        prop_type: { type: GraphQLString },
+        sort: { type: GraphQLString },
+        radius: { type: GraphQLInt },
+        price_min: { type: GraphQLInt },
+        price_max: { type: GraphQLInt },
+        baths_min: { type: GraphQLInt },
+        beds_min: { type: GraphQLInt },
+        sqft_min: { type: GraphQLInt },
+        sqft_max: { type: GraphQLInt },
+        age_min: { type: GraphQLInt },
+        age_max: { type: GraphQLInt },
+        lot_sqft_min: { type: GraphQLInt },
+        lot_sqft_max: { type: GraphQLInt },
+        is_matterports: { type: GraphQLString },
+        is_foreclosure: { type: GraphQLString },
+        is_contingent: { type: GraphQLString },
+        is_pending: { type: GraphQLString },
+        has_open_house: { type: GraphQLString },
+        is_new_construction: { type: GraphQLString },
+        is_new_plan: { type: GraphQLString },
+        features: { type: GraphQLString },
+        prop_sub_type: { type: GraphQLString }
       },
       async resolve(_, args) {
         const { getForSales } = await import('../resolvers');
@@ -653,7 +694,19 @@ const RootQueryType = new GraphQLObjectType({
     },
     agents: {
       type: new GraphQLList(AgentDetailType),
-      args: { zip: { type: GraphQLString } },
+      args: {
+        postal_code: { type: GraphQLString },
+        sort: { type: GraphQLString },
+        offset: { type: GraphQLInt },
+        limit: { type: GraphQLInt },
+        name: { type: GraphQLString },
+        types: { type: GraphQLString },
+        recommendations_count_min: { type: GraphQLInt },
+        agent_rating_min: { type: GraphQLInt },
+        price_min: { type: GraphQLInt },
+        agent_type: { type: GraphQLString },
+        price_max: { type: GraphQLInt }
+      },
       async resolve(_, args) {
         const { getAgents } = await import('../resolvers');
         return await getAgents(args);
